@@ -1,0 +1,540 @@
+-- Markus Hive Code
+
+CREATE EXTERNAL TABLE IF NOT EXISTS nonderiv (
+URL STRING,
+accessionNumber STRING,
+filingDate DATE,
+filerCik STRING,
+transactionType STRING,
+tableRow INT,
+securityTitle STRING,
+securityTitleFn STRING,
+transactionDate DATE,
+transactionDateFn STRING,
+deemedExecutionDate DATE,
+deemedExecutionDateFn STRING,
+transactionFormType STRING,
+transactionCode STRING,
+equitySwapInvolved INT,
+transactionCodeFn STRING,
+transactionTimeliness STRING,
+transactionTimelinessFn STRING,
+transactionShares DOUBLE,
+transactionSharesFn STRING,
+transactionPricePerShare DOUBLE,
+transactionPricePerShareFn STRING,
+transactionAcquiredDisposedCode STRING,
+transactionAcquiredDisposedCdFn STRING,
+sharesOwnedFollowingTransaction DOUBLE,
+sharesOwnedFolwngTransactionFn STRING,
+valueOwnedFollowingTransaction DOUBLE,
+valueOwnedFolwngTransactionFn STRING,
+directOrIndirectOwnership STRING,
+directOrIndirectOwnershipFn STRING,
+natureOfOwnership STRING,
+natureOfOwnershipFn STRING
+) 
+row format SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' WITH SERDEPROPERTIES
+("separatorChar" = ",","quoteChar" = "\"","escapeChar" = "\\")
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_nonderiv/'
+TBLPROPERTIES ('skip.header.line.count'='1')
+;
+
+
+CREATE EXTERNAL TABLE IF NOT EXISTS nonderiv_rand (
+URL STRING,
+accessionNumber STRING,
+filingDate DATE,
+filerCik STRING,
+transactionType STRING,
+tableRow INT,
+securityTitle STRING,
+securityTitleFn STRING,
+transactionDate DATE,
+transactionDateFn STRING,
+deemedExecutionDate DATE,
+deemedExecutionDateFn STRING,
+transactionFormType STRING,
+transactionCode STRING,
+equitySwapInvolved INT,
+transactionCodeFn STRING,
+transactionTimeliness STRING,
+transactionTimelinessFn STRING,
+transactionShares DOUBLE,
+transactionSharesFn STRING,
+transactionPricePerShare DOUBLE,
+transactionPricePerShareFn STRING,
+transactionAcquiredDisposedCode STRING,
+transactionAcquiredDisposedCdFn STRING,
+sharesOwnedFollowingTransaction DOUBLE,
+sharesOwnedFolwngTransactionFn STRING,
+valueOwnedFollowingTransaction DOUBLE,
+valueOwnedFolwngTransactionFn STRING,
+directOrIndirectOwnership STRING,
+directOrIndirectOwnershipFn STRING,
+natureOfOwnership STRING,
+natureOfOwnershipFn STRING
+)
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_nonderiv_rand'
+TBLPROPERTIES ('skip.header.line.count'='1')
+;
+
+
+
+INSERT OVERWRITE TABLE nonderiv_rand
+SELECT * FROM nonderiv
+WHERE rand() <= 0.1
+DISTRIBUTE BY rand()
+SORT BY rand()
+LIMIT 100000;
+
+
+SELECT * FROM nonderiv_query LIMIT 5;
+
+
+CREATE TABLE nonderiv_query AS
+SELECT
+transactionType,
+securityTitle
+FROM 
+nonderiv_rand;
+
+
+INSERT OVERWRITE DIRECTORY '/user/mjust/tmp/'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT
+*
+FROM
+nonderiv_query;
+
+
+
+hdfs dfs -get tmp/000000_0 nonderiv_query.csv
+
+
+
+
+scp mjust@144.24.53.159:/home/mjust/nonderiv_query.csv .
+
+-- Jeevan Hive Code 
+DROP TABLE IF EXISTS deriv;
+CREATE EXTERNAL TABLE IF NOT EXISTS deriv(
+URL STRING,
+accessionNumber STRING,
+filingDate DATE,
+filerCik STRING,
+transactionType STRING,
+tableRow INT,
+securityTitle STRING,
+securityTitleFn STRING,
+conversionOrExercisePrice DOUBLE,
+conversionOrExercisePriceFn STRING,
+transactionDate DATE,
+transactionDateFn STRING,
+deemedExecutionDate DATE,
+deemedExecutionDateFn STRING,
+transactionFormType STRING,            
+transactionCode STRING, 
+equitySwapInvolved INT,
+transactionCodeFn STRING,
+transactionTimeliness STRING,
+transactionTimelinessFn STRING,
+transactionShares BIGINT,
+transactionSharesFn STRING,
+transactionTotalValue DOUBLE,
+transactionTotalValueFn STRING,
+transactionPricePerShare DOUBLE,
+transactionPricePerShareFn STRING,
+transactionAcquiredDisposedCode STRING, 
+transactionAcquiredDisposedCdFn STRING,
+exerciseDate DATE,
+exerciseDateFn STRING,
+expirationDate DATE,
+expirationDateFn STRING,
+underlyingSecurityTitle STRING,
+underlyingSecurityTitleFn STRING, 
+underlyingSecurityShares BIGINT,
+underlyingSecuritySharesFn STRING,
+underlyingSecurityValue DOUBLE,
+underlyingSecurityValueFn STRING,
+sharesOwnedFollowingTransaction BIGINT, 
+sharesOwnedFolwngTransactionFn STRING,
+valueOwnedFollowingTransaction DOUBLE,
+valueOwnedFolwngTransactionFn STRING,
+directOrIndirectOwnership STRING,
+directOrIndirectOwnershipFn STRING,
+natureOfOwnership STRING,
+natureOfOwnershipFn STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
+WITH SERDEPROPERTIES 
+('separatorChar' = ',', 'quoteChar' = '"', 'escapeChar' = '\\' )
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_deriv/'
+;
+
+DROP TABLE IF EXISTS deriv_rand;
+CREATE EXTERNAL TABLE IF NOT EXISTS deriv_rand(
+URL STRING,
+accessionNumber STRING,
+filingDate DATE,
+filerCik STRING,
+transactionType STRING,
+tableRow INT,
+securityTitle STRING,
+securityTitleFn STRING,
+conversionOrExercisePrice DOUBLE,
+conversionOrExercisePriceFn STRING,
+transactionDate DATE,
+transactionDateFn STRING,
+deemedExecutionDate DATE,
+deemedExecutionDateFn STRING,
+transactionFormType STRING,            
+transactionCode STRING, 
+equitySwapInvolved INT,
+transactionCodeFn STRING,
+transactionTimeliness STRING,
+transactionTimelinessFn STRING,
+transactionShares BIGINT,
+transactionSharesFn STRING,
+transactionTotalValue DOUBLE,
+transactionTotalValueFn STRING,
+transactionPricePerShare DOUBLE,
+transactionPricePerShareFn STRING,
+transactionAcquiredDisposedCode STRING, 
+transactionAcquiredDisposedCdFn STRING,
+exerciseDate DATE,
+exerciseDateFn STRING,
+expirationDate DATE,
+expirationDateFn STRING,
+underlyingSecurityTitle STRING,
+underlyingSecurityTitleFn STRING, 
+underlyingSecurityShares BIGINT,
+underlyingSecuritySharesFn STRING,
+underlyingSecurityValue DOUBLE,
+underlyingSecurityValueFn STRING,
+sharesOwnedFollowingTransaction BIGINT, 
+sharesOwnedFolwngTransactionFn STRING,
+valueOwnedFollowingTransaction DOUBLE,
+valueOwnedFolwngTransactionFn STRING,
+directOrIndirectOwnership STRING,
+directOrIndirectOwnershipFn STRING,
+natureOfOwnership STRING,
+natureOfOwnershipFn STRING
+)
+ROW FORMAT SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' 
+WITH SERDEPROPERTIES 
+('separatorChar' = ',', 'quoteChar' = '"', 'escapeChar' = '\\' )
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_deriv_rand/'
+;
+
+INSERT OVERWRITE TABLE deriv_rand
+SELECT * FROM deriv
+WHERE rand() <= 0.1
+DISTRIBUTE BY rand()
+SORT BY rand()
+LIMIT 100000;
+
+CREATE TABLE deriv_query AS
+SELECT 
+transactionType,
+securityTitle,
+transactionDate,
+conversionOrExercisePrice,
+transactionShares,
+transactionPricePerShare,
+valueOwnedFollowingTransaction,
+directOrIndirectOwnership
+FROM 
+    deriv
+WHERE 
+    conversionOrExercisePrice IS NOT NULL
+    AND transactionShares IS NOT NULL
+;
+
+INSERT OVERWRITE DIRECTORY '/user/jhall15/tmp/'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ',' 
+SELECT 
+transactionType,
+securityTitle,
+transactionDate,
+conversionOrExercisePrice,
+transactionShares,
+transactionPricePerShare,
+valueOwnedFollowingTransaction,
+directOrIndirectOwnership
+FROM 
+    deriv_rand
+;
+hdfs dfs -get tmp/000000_0 deriv_query.csv
+
+scp jhall15@144.24.53.159:/home/jhall15/nonderiv_query.csv .
+
+-- Oliver Hive Code
+
+CREATE EXTERNAL TABLE IF NOT EXISTS reportingowner (
+URL STRING,
+accessionNumber STRING,
+filingDate DATE,
+filerCik INT,
+rptOwnerCik INT,
+rptOwnerName STRING,
+rptOwnerStreet1 STRING,
+rptOwnerStreet2 STRING,
+rptOwnerCity STRING,
+rptOwnerState STRING,
+rptOwnerZipCode INT,
+rptOwnerStateDescription STRING,
+isDirector INT,
+isOfficer INT,
+isTenPercentOwner INT,
+isOther INT,
+officerTitle STRING,
+otherText STRING
+)
+row format SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' WITH SERDEPROPERTIES
+("separatorChar" = ",","quoteChar" = "\"","escapeChar" = "\\")
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_reportingowner/'
+TBLPROPERTIES ('skip.header.line.count'='1')
+;
+
+CREATE EXTERNAL TABLE IF NOT EXISTS reportingowner_rand (
+URL STRING,
+accessionNumber STRING,
+filingDate DATE,
+filerCik INT,
+rptOwnerCik INT,
+rptOwnerName STRING,
+rptOwnerStreet1 STRING,
+rptOwnerStreet2 STRING,
+rptOwnerCity STRING,
+rptOwnerState STRING,
+rptOwnerZipCode INT,
+rptOwnerStateDescription STRING,
+isDirector INT,
+isOfficer INT,
+isTenPercentOwner INT,
+isOther INT,
+officerTitle STRING,
+otherText STRING
+)
+row format SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' WITH SERDEPROPERTIES
+("separatorChar" = ",","quoteChar" = "\"","escapeChar" = "\\")
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_reportingowner_rand/'
+TBLPROPERTIES ('skip.header.line.count'='1')
+;
+
+INSERT OVERWRITE TABLE reportingowner_rand
+SELECT * FROM reportingowner
+WHERE rand() <= 0.1
+DISTRIBUTE BY rand()
+SORT BY rand()
+LIMIT 100000;
+
+CREATE TABLE reportingowner_query AS //this was my first query
+SELECT
+rptOwnerState,
+officerTitle
+FROM
+reportingowner_rand;
+
+CREATE TABLE reportingowner_query1 AS 
+SELECT  
+rptOwnerName, 
+rptOwnerStreet1, 
+rptOwnerStreet2, 
+rptOwnerCity, 
+rptOwnerState, 
+rptOwnerZipCode, 
+isDirector, 
+isOfficer, 
+isTenPercentOwner, 
+officerTitle
+FROM  
+reportingowner_rand
+WHERE 
+rptOwnerState NOT LIKE "NULL" 
+AND 
+rptOwnerCity NOT LIKE "NULL"
+AND
+officerTitle NOT LIKE "NULL"
+;
+
+CREATE TABLE reportingowner_query2 AS 
+SELECT  
+rptOwnerState,
+isTenPercentOwner, 
+officerTitle
+FROM  
+reportingowner_rand
+WHERE 
+rptOwnerState NOT LIKE "NULL" 
+AND 
+rptOwnerCity NOT LIKE "NULL"
+AND
+officerTitle NOT LIKE "NULL"
+;
+
+SELECT  
+rptOwnerState, 
+rptOwnerCity, 
+COUNT(*) 
+FROM  cleaned_reportingowner
+GROUP BY 
+rptOwnerState,rptOwnerCity 
+; 
+
+
+INSERT OVERWRITE DIRECTORY '/user/odiaz33/tmp/'
+ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+SELECT * FROM reportingowner_query2;
+
+hdfs dfs -get tmp/000000_0 reportingowner_query2.csv
+
+scp odiaz33@144.24.53.159:/home/odiaz33/reportingowner_query2.csv .
+
+-- Karen Hive Code 
+CREATE EXTERNAL TABLE IF NOT EXISTS panel( 
+URL STRING, 
+acceptanceDatetime DATE, 
+accessionNumber STRING, 
+type STRING, 
+period STRING, 
+filingDate DATE, 
+dateOfFilingDateChange DATE, 
+documentType STRING, 
+periodOfReport DATE, 
+dateOfOriginalSubmission DATE, 
+notSubjectToSection16 INT, 
+issuerTradingSymbol STRING, 
+m_isDirector INT, 
+m_isOfficer INT, 
+m_isTenPercentOwner INT, 
+m_isOther INT, 
+transactionType STRING, 
+tableRow INT, 
+securityTitle STRING, 
+securityTitleFn STRING, 
+transactionDate DATE, 
+transactionDateFn STRING, 
+deemedExecutionDate DATE, 
+deemedExecutionDateFn STRING, 
+transactionFormType STRING, 
+transactionCode STRING, 
+equitySwapInvolved INT, 
+transactionCodeFn STRING, 
+transactionTimeliness STRING, 
+transactionTimelinessFn STRING, 
+transactionShares BIGINT, 
+transactionSharesFn STRING, 
+transactionPricePerShare DOUBLE, 
+transactionPricePerShareFn STRING, 
+transactionAcquiredDisposedCode STRING, 
+transactionAcquiredDisposedCdFn STRING, 
+sharesOwnedFollowingTransaction BIGINT, 
+sharesOwnedFolwngTransactionFn STRING, 
+valueOwnedFollowingTransaction DOUBLE, 
+valueOwnedFolwngTransactionFn STRING, 
+directOrIndirectOwnership STRING, 
+directOrIndirectOwnershipFn DOUBLE, 
+natureofOwnership STRING, 
+natureofOwnershipFn DOUBLE, 
+conversionorExercisePRice BIGINT, 
+conversionorExercisePriceFn STRING, 
+transactionTotalValue STRING 
+) 
+
+row format SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' WITH SERDEPROPERTIES  
+("separatorChar" = ",","quoteChar" = "\"","escapeChar" = "\\") 
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_panel/‘; 
+
+ 
+
+CREATE EXTERNAL TABLE IF NOT EXISTS panel_rand( 
+URL STRING, 
+acceptanceDatetime DATE, 
+accessionNumber STRING, 
+type STRING, 
+period STRING, 
+filingDate DATE, 
+dateOfFilingDateChange DATE, 
+documentType STRING, 
+periodOfReport DATE, 
+dateOfOriginalSubmission DATE, 
+notSubjectToSection16 INT, 
+issuerTradingSymbol STRING, 
+m_isDirector INT,
+m_isOfficer INT, 
+m_isTenPercentOwner INT, 
+m_isOther INT, 
+transactionType STRING, 
+tableRow INT, 
+securityTitle STRING, 
+securityTitleFn STRING, 
+transactionDate DATE, 
+transactionDateFn STRING, 
+deemedExecutionDate DATE, 
+deemedExecutionDateFn STRING, 
+transactionFormType STRING, 
+transactionCode STRING, 
+equitySwapInvolved INT, 
+transactionCodeFn STRING, 
+transactionTimeliness STRING, 
+transactionTimelinessFn STRING, 
+transactionShares BIGINT, 
+transactionSharesFn STRING, 
+transactionPricePerShare DOUBLE, 
+transactionPricePerShareFn STRING, 
+transactionAcquiredDisposedCode STRING, 
+transactionAcquiredDisposedCdFn STRING, 
+sharesOwnedFollowingTransaction BIGINT, 
+sharesOwnedFolwngTransactionFn STRING, 
+valueOwnedFollowingTransaction DOUBLE, 
+valueOwnedFolwngTransactionFn STRING, 
+directOrIndirectOwnership STRING, 
+directOrIndirectOwnershipFn DOUBLE, 
+natureofOwnership STRING, 
+natureofOwnershipFn DOUBLE, 
+conversionorExercisePRice BIGINT, 
+conversionorExercisePriceFn STRING, 
+transactionTotalValue STRING 
+) 
+
+row format SERDE 'org.apache.hadoop.hive.serde2.OpenCSVSerde' WITH SERDEPROPERTIES  
+("separatorChar" = ",","quoteChar" = "\"","escapeChar" = "\\") 
+STORED AS TEXTFILE LOCATION '/user/jhall15/data_1/lit_panel/‘; 
+
+ 
+
+INSERT OVERWRITE TABLE panel_rand 
+SELECT * FROM panel 
+WHERE rand() <= 0.1 
+DISTRIBUTE BY rand() 
+SORT BY rand() 
+LIMIT 100000; 
+
+ 
+
+CREATE TABLE panel_table AS 
+SELECT 
+filingDate, 
+issuerTradingSymbol, 
+documentType, 
+securityTitle, 
+transactionType, 
+FROM  
+panel; 
+
+ 
+
+hdfs dfs -get tmp/000000_0 panel_table.csv 
+
+ 
+
+scp kmarcos@144.24.53.159:/home/kmarcos/panel_table . 
+
+ 
+
+
+
+
+
